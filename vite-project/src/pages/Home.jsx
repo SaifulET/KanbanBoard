@@ -19,7 +19,8 @@ const Home = () => {
       }
       
     })
-    .catch(()=>{
+    .catch((e)=>{
+      console.log(e)
       setText("Login");
       navigate('/login');
     })
