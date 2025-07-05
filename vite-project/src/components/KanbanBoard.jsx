@@ -1,53 +1,42 @@
-import  { useState } from 'react';
+import  { useEffect,  useState } from 'react';
 import AddTaskBar from './AddTaskBar';
 import Column from './Column';
+import axios  from 'axios';
 
 const KanbanBoard = () => {
   const [columns, setColumns] = useState({
-    todo: {
-      name: "To Do",
-      items: [
-        {
-          id: "1",
-          title: "Market Research",
-          description: "Gather all recent market trends and statistics.",
-          dueDate: "2025-07-01",
-          extra: "Priority High"
-        },
-        {
-          id: "2",
-          title: "Write Project",
-          description: "Complete the first draft of the project document.",
-          dueDate: "2025-07-05",
-          extra: ""
-        }
-      ]
-    },
-    inProgress: {
-      name: "In Progress",
-      items: [
-        {
-          id: "3",
-          title: "Design UI mockups",
-          description: "Create wireframes and high fidelity mockups.",
-          dueDate: "2025-06-25",
-          extra: ""
-        }
-      ]
-    },
-    done: {
-      name: "Done",
-      items: [
-        {
-          id: "4",
-          title: "Set up Repository",
-          description: "Initialized git repo and pushed initial commit.",
-          dueDate: "2025-06-20",
-          extra: ""
-        }
-      ]
-    }
+  todo: { name: "To Do", items: [] },
+  inProgress: { name: "In Progress", items: [] },
+  done: { name: "Done", items: [] }
   });
+  useEffect(()=>{
+    (async()=>{
+      try {
+    const res = await axios.get(`/kanbanGet`,{withCredentials:true});
+    console.log(res.data);
+    if(res.data){
+      const board=res.data;
+      setColumns({
+        todo: board.todo,
+        inProgress: board.inProgress,
+        done: board.done
+      })
+    }
+  } catch (err) {
+    console.error('Error fetching user Kanban:', err);
+  }
+    })()
+  },[])
+
+  const updataMongoose=async(updateColumns)=>{
+    try {
+    const res = await axios.post(`/kanban`,{...updateColumns},{withCredentials:true});
+    console.log(res.data);
+  } catch (err) {
+    console.error('Error fetching user Kanban:', err);
+  }
+    
+  }
 
   const [newTask, setNewTask] = useState("");
   const [activeColumn, setActiveColumn] = useState("todo");
@@ -67,12 +56,14 @@ const KanbanBoard = () => {
     });
     setColumns(updatedColumns);
     setNewTask("");
+    updataMongoose(updatedColumns);
   };
 
   const removeTask = (columnId, taskId) => {
     const updatedColumns = { ...columns };
     updatedColumns[columnId].items = updatedColumns[columnId].items.filter(item => item.id !== taskId);
     setColumns(updatedColumns);
+    updataMongoose(updatedColumns);
   };
 
   const updateTask = (taskId, updatedData) => {
@@ -83,6 +74,7 @@ const KanbanBoard = () => {
       );
     }
     setColumns(updatedColumns);
+    updataMongoose(updatedColumns);
   };
 
   const handleDragStart = (columnId, item) => {
@@ -125,6 +117,7 @@ const KanbanBoard = () => {
     updatedColumns[targetColumnId].items.splice(insertIndex, 0, item);
 
     setColumns(updatedColumns);
+    updataMongoose(updatedColumns)
     setDraggedItem(null);
     setDragOverIndex(null);
     setDragOverColumnId(null);
@@ -158,7 +151,7 @@ const KanbanBoard = () => {
         setActiveColumn={setActiveColumn}
         addNewTask={addNewTask}
       />
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-center gap-6 overflow-x-auto pb-6 w-full">
+      <div className=" flex flex-col lg:flex-row lg:items-center lg:justify-center gap-6 overflow-x-auto pb-6 w-full">
         {Object.keys(columns).map(columnId => (
           <Column
             key={columnId}
@@ -170,6 +163,7 @@ const KanbanBoard = () => {
             onUpdate={updateTask}
             onDragOverItem={handleDragOverItem}
             columnStyles={columnStyles[columnId]}
+            
           />
         ))}
       </div>

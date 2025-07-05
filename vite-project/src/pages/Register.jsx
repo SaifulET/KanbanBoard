@@ -34,7 +34,7 @@ const Register = () => {
 
   return (
    <div className="flex items-center border border-blue-500  bg-green-700 h-screen">
-     <form onSubmit={handleSubmit} className=" max-w-md mx-auto space-y-4 p-10  border rounded h-[50%] bg-gray-700">
+     <form onSubmit={handleSubmit} className="pb-20 max-w-md mx-auto space-y-4 p-10  border rounded h-[50%] bg-gray-700">
       <div>
         <label htmlFor="name" className="block mb-1 font-medium text-yellow-50">Name</label>
         <input

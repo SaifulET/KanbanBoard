@@ -3,7 +3,7 @@ import TaskCard from './TaskCard';
 const Column = ({ columnId, column, onDragStart,onDragOverItem, onDrop, onRemove, onUpdate, columnStyles }) => {
   return (
     <div
-      className={`flex-shrink-0 w-full sm:w-72 md:w-80 bg-zinc-800 rounded-lg shadow-xl border-t-4 ${columnStyles.border} min-w-[90%] sm:min-w-0`}
+      className={` flex-shrink-0 w-full sm:w-72 md:w-80 bg-zinc-800 rounded-lg shadow-xl border-t-4 ${columnStyles.border} min-w-[90%] sm:min-w-0`}
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => onDrop(e, columnId)}
     >

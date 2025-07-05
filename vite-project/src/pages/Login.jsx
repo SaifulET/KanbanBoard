@@ -5,9 +5,13 @@ import UserStore from "../store/UserStore";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie"
 import Navbar from "../components/Navbar";
+import { useAuth } from "../context/AuthContext";
 
+ 
+ 
 const Login = () => {
-  const {setText}=UserStore()
+   const { isAuthenticated ,loading,login} = useAuth();
+  const {setText,text}=UserStore()
   const navigate = useNavigate();
     const [formData, setFormData] = useState({
     email: "",
@@ -22,10 +26,12 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post("/login",{email:formData.email,password:formData.password})
+    console.log(typeof(text));
+     axios.post("/login",{email:formData.email,password:formData.password})
     .then((res)=>{
-      console.log(res)
+      
         if(res.status===200){
+          login()
           Cookies.set("token", res.data.token);
           setText(res.data.user.name);
           navigate("/")
@@ -34,11 +40,14 @@ const Login = () => {
     
     })
     .catch((res)=>{
+
+
       if(res.status===500){
         console.log(res)
         setError("User not found!");
       }
       else{
+        console.log(res)
         setError("Invalid Password!")
       }
     })
@@ -47,7 +56,7 @@ const Login = () => {
 
   return (
     <div>
-      <Navbar/>
+
       <div className="flex items-center justify-center h-screen bg-green-700">
         <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center max-w-sm mx-auto space-y-4 p-10 h-[50%] bg-gray-700 border  rounded">
       <div>

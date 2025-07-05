@@ -9,11 +9,20 @@ const ProfileEditModal = ({ user, onClose, onUpdate }) => {
     profession: user.profession || '',
     experience: user.experience || '',
     institution: user.institution || '',
+    image:user.img ||  null ,
   });
 
 
   
-
+const handleFile=(e)=>{
+    const file = e.target.files[0];
+    if (file) {
+      setForm({
+        ...form,
+        image: file, 
+      });
+    }
+  }
   const handleChange = (e) => {
     const { name, value } = e.target;
    
@@ -22,10 +31,17 @@ const ProfileEditModal = ({ user, onClose, onUpdate }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const uploadData = new FormData();
+    uploadData.append("name", form.name);
+    uploadData.append("profession", form.profession);
+    uploadData.append("experience", form.experience);
+    uploadData.append("institution", form.institution);
+    uploadData.append("file", form.image);
     
     try {
       
-       await axios.post("/profile",form,{withCredentials:true});
+       await axios.post("/profile",uploadData,{withCredentials:true});
       onUpdate(); // refetch user
       onClose();  // close modal
     } catch (err) {
@@ -39,6 +55,16 @@ const ProfileEditModal = ({ user, onClose, onUpdate }) => {
       <div className="bg-white p-6 rounded-md w-full max-w-lg shadow-lg relative">
         <h2 className="text-xl font-semibold mb-4">Edit Profile</h2>
         <form onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
+          <div>
+            <label className="block text-sm font-medium pb-2">Change Profile Picture</label>
+            <input
+          type="file"
+          name="image"
+          id="image"
+           className="w-full border px-3 py-2 rounded"
+          onChange={handleFile}
+          />
+          </div>
           <div>
             <label className="block text-sm font-medium">Name</label>
             <input type="text" name="name" value={form.name} onChange={handleChange}
@@ -59,6 +85,7 @@ const ProfileEditModal = ({ user, onClose, onUpdate }) => {
             <input type="text" name="institution" value={form.institution} onChange={handleChange}
               className="w-full border px-3 py-2 rounded" />
           </div>
+
           <div className="flex justify-end gap-2">
             <button type="button" onClick={onClose} className="px-4 py-2 border rounded">Cancel</button>
             <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
